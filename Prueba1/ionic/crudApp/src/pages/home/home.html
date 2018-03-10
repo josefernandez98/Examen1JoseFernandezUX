@@ -1,0 +1,84 @@
+<ion-header>
+  <ion-navbar>
+    
+    <!--ion-buttons end *ngIf="afAuth.authState | async">
+    <button color="primary" ion-button icon-only (click)="addSong()">
+    <ion-icon name="add-circle"></ion-icon>
+    </button>
+    </ion-buttons-->
+    
+    <ion-title>
+      <ion-item class="item item-trns text-center">
+        Ejercicio Ionic App
+        <ion-avatar item-end *ngIf="afAuth.authState | async">
+          <img src={{currentUser.photoURL}}>
+        </ion-avatar>
+      </ion-item>  
+    </ion-title>
+  </ion-navbar>
+</ion-header>
+
+<ion-content padding>
+  <div *ngIf="afAuth.authState | async as user; else showLogin">
+    <h1>Hello {{ user.displayName }}!</h1>
+    <button ion-button color="primary" full (click)="logout()">Logout</button>
+    <ion-list>
+      <ion-item *ngFor="let song of songs | async" (click)="showOptions(song.id, song.title)">
+        {{song.title}}
+      </ion-item>
+    </ion-list>
+    <ion-fab right bottom>
+      <button ion-fab  (click)="addSong()">
+        <ion-icon name="add" ></ion-icon>
+      </button>
+    </ion-fab>
+  </div>
+
+  <ng-template #showLogin>
+    <p>Please login.</p>
+    <button ion-button color="danger"  full (click)="login()" icon-right>
+      <ion-icon name="logo-googleplus"></ion-icon>
+        Login with Google
+    </button>
+  </ng-template>
+
+  <!-- Comenzando el Google Search Bar -->
+  
+  <input id="textbox" type="text" placeholder="Search on Google..." 
+  onkeydown="if (event.keyCode == 13 || event.which == 13) { location='http://www.google.com/search?q=' 
+  + encodeURIComponent(document.getElementById('textbox').value);}" />
+  
+  <!-- Terminando el Google Search Bar -->
+
+  <!-- Comenzando redes soclaies -->
+    <a ion-thumbnail ion-item href="https://www.facebook.com">
+      <img src = "https://firebasestorage.googleapis.com/v0/b/practicaux.appspot.com/o/fb.PNG?alt=media&token=d7484950-66f2-4b80-bc18-c6c9fd8df7b0">
+    </a>
+  
+    <a ion-thumbnail ion-item href="https://www.twitter.com">
+      <img src = "">
+    </a>
+
+    <a ion-thumbnail ion-item href="https://www.instagram.com">
+      <img src = "">
+    </a>
+  <!-- Terminando redes sociales -->
+
+  <!-- Comenzando el Search Bar-->
+  <ion-searchbar (ionInput) = "getTopics($event)" [showCancelButton] = "shouldShowCancel" (ionCancel)="onCancel($event)"></ion-searchbar>
+
+  <ion-list>
+    <ion-item *ngFor = "let topic of topics">
+      {{topic}}
+    </ion-item>
+  </ion-list>
+  <!--Terminando el search bar -->
+  
+</ion-content>
+
+<ion-footer>
+  <div class="bottom_bar">
+    <ion-title>José Ricardo Fernández Ortega. 2018</ion-title>
+  </div>
+</ion-footer>
+
