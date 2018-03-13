@@ -55,11 +55,12 @@ var __metadata = (this && this.__metadata) || function (k, v) {
     if (typeof Reflect === "object" && typeof Reflect.metadata === "function") return Reflect.metadata(k, v);
 };
 
+/*Termina el CODIGO NO TOCAR */
 
-
-
+/*Comienza el codigo editable.*/
 
 var HomePage = (function () {
+    
     function HomePage(navCtrl, alertCtrl, actionSheetCtrl, afDatabase, afAuth) {
         var _this = this;
         this.navCtrl = navCtrl;
@@ -77,6 +78,7 @@ var HomePage = (function () {
             _this.currentUser = { uid: user.uid, photoURL: user.photoURL };
         });
     }
+
     HomePage.prototype.addSong = function () {
         var _this = this;
         var prompt = this.alertCtrl.create({
@@ -110,6 +112,8 @@ var HomePage = (function () {
         });
         prompt.present();
     };
+
+
     HomePage.prototype.showOptions = function (songId, songTitle) {
         var _this = this;
         var actionSheet = this.actionSheetCtrl.create({
@@ -137,9 +141,13 @@ var HomePage = (function () {
         });
         actionSheet.present();
     };
+
+
     HomePage.prototype.removeSong = function (songId) {
         this.songsRef.remove(songId);
     };
+
+
     HomePage.prototype.updateSong = function (songId, songTitle) {
         var _this = this;
         var prompt = this.alertCtrl.create({
@@ -171,6 +179,9 @@ var HomePage = (function () {
         });
         prompt.present();
     };
+
+
+
     HomePage.prototype.login = function () {
         var _this = this;
         this.afAuth.auth.signInWithPopup(new __WEBPACK_IMPORTED_MODULE_4_firebase_app__["auth"].GoogleAuthProvider())
@@ -186,13 +197,19 @@ var HomePage = (function () {
             //});
         });
     };
+
+
     HomePage.prototype.loginWithEmail = function () {
         this.afAuth.auth.signInWithPopup(new __WEBPACK_IMPORTED_MODULE_4_firebase_app__["auth"].EmailAuthProvider()).then(function (xx) {
         });
     };
+
+    
     HomePage.prototype.logout = function () {
         this.afAuth.auth.signOut();
     };
+
+
     HomePage = __decorate([
         Object(__WEBPACK_IMPORTED_MODULE_0__angular_core__["m" /* Component */])({
             selector: 'page-home',template:/*ion-inline-start:"/Users/Peis/Documents/caTICs/Projects/github/ionic/crudApp/src/pages/home/home.html"*/'<ion-header>\n  <ion-navbar>\n  <!--ion-buttons end *ngIf="afAuth.authState | async">\n          <button color="primary" ion-button icon-only (click)="addSong()">\n            <ion-icon name="add-circle"></ion-icon>\n          </button>\n        </ion-buttons-->\n        \n    <ion-title>\n      <ion-item class="item item-trns text-center">\n          My music list\n        <ion-avatar item-end *ngIf="afAuth.authState | async">\n          <img src={{currentUser.photoURL}}>\n        </ion-avatar>\n      </ion-item>\n      \n    </ion-title>\n  </ion-navbar>\n</ion-header>\n\n<ion-content padding>\n    <div *ngIf="afAuth.authState | async as user; else showLogin">\n        <h1>Hello {{ user.displayName }}!</h1>\n        <button ion-button color="primary" full (click)="logout()">Logout</button>\n        <ion-list>\n            <ion-item *ngFor="let song of songs | async" (click)="showOptions(song.id, song.title)">\n              {{song.title}}\n            </ion-item>\n          </ion-list>\n        <ion-fab right bottom>\n          <button ion-fab  (click)="addSong()">\n            <ion-icon name="add" ></ion-icon>\n          </button>\n        </ion-fab>\n\n      </div>\n      <ng-template #showLogin>\n        <p>Please login.</p>\n        <button ion-button color="danger"  full (click)="login()" icon-right>\n          <ion-icon name="logo-googleplus"></ion-icon>\n          Login with Google\n        </button>\n      </ng-template>\n</ion-content>\n'/*ion-inline-end:"/Users/Peis/Documents/caTICs/Projects/github/ionic/crudApp/src/pages/home/home.html"*/
@@ -204,6 +221,10 @@ var HomePage = (function () {
             __WEBPACK_IMPORTED_MODULE_3_angularfire2_auth__["a" /* AngularFireAuth */]])
     ], HomePage);
     return HomePage;
+
+
+
+
 }());
 
 //# sourceMappingURL=home.js.map
@@ -259,12 +280,12 @@ var __decorate = (this && this.__decorate) || function (decorators, target, key,
 
 // AF2 Settings
 var firebaseConfig = {
-    apiKey: "AIzaSyD8mG8BKodc9OFcwa7BjnnGJJ2EQ7jymAM",
-    authDomain: "test-4ee20.firebaseapp.com",
-    databaseURL: "https://test-4ee20.firebaseio.com",
-    projectId: "test-4ee20",
-    storageBucket: "test-4ee20.appspot.com",
-    messagingSenderId: "616789067377"
+    apiKey: "AIzaSyBjIIdKK3uRkcOdaslfNlPdZPsD7u385zM",
+    authDomain: "prueba1jfernandez.firebaseapp.com",
+    databaseURL: "https://prueba1jfernandez.firebaseio.com",
+    projectId: "prueba1jfernandez",
+    storageBucket: "prueba1jfernandez.appspot.com",
+    messagingSenderId: "672172112699"
 };
 var AppModule = (function () {
     function AppModule() {
@@ -298,6 +319,19 @@ var AppModule = (function () {
     ], AppModule);
     return AppModule;
 }());
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 //# sourceMappingURL=app.module.js.map
 

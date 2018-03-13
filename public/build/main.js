@@ -67,129 +67,24 @@ var HomePage = (function () {
         this.actionSheetCtrl = actionSheetCtrl;
         this.afDatabase = afDatabase;
         this.afAuth = afAuth;
-        this.songsRef = afDatabase.list('songs');
-        this.songs = this.songsRef.valueChanges();
         afAuth.authState.subscribe(function (user) {
             if (!user) {
                 _this.currentUser = null;
                 return;
             }
-            _this.currentUser = { uid: user.uid, photoURL: user.photoURL };
+            var seguidores = 0;
+            _this.currentUser = { uid: user.uid, photoURL: user.photoURL, name: user.displayName };
+            _this.UsersRef = afDatabase.list('users', function (ref) {
+                return ref.orderByKey();
+            });
+            _this.ListaUsers = _this.UsersRef.valueChanges();
+            _this.mensajesRef = afDatabase.list('mensajes', function (ref) {
+                return ref.orderByChild('orden');
+            });
+            _this.ListaMensajes = _this.mensajesRef.valueChanges();
         });
-        this.generateTopics();
-    }
-    HomePage.prototype.addSong = function () {
-        var _this = this;
-        var prompt = this.alertCtrl.create({
-            title: 'Song Name',
-            message: "Enter a name for this new song you're so keen on adding",
-            inputs: [
-                {
-                    name: 'title',
-                    placeholder: 'Title'
-                },
-            ],
-            buttons: [
-                {
-                    text: 'Cancel',
-                    handler: function (data) {
-                        console.log('Cancel clicked');
-                    }
-                },
-                {
-                    text: 'Save',
-                    handler: function (data) {
-                        var newSongRef = _this.songsRef.push({});
-                        newSongRef.set({
-                            id: newSongRef.key,
-                            title: data.title,
-                            uid: _this.currentUser.uid
-                        });
-                    }
-                }
-            ]
-        });
-        prompt.present();
-    };
-    HomePage.prototype.showOptions = function (songId, songTitle) {
-        var _this = this;
-        var actionSheet = this.actionSheetCtrl.create({
-            title: 'What do you want to do?',
-            buttons: [
-                {
-                    text: 'Delete Song',
-                    role: 'destructive',
-                    handler: function () {
-                        _this.removeSong(songId);
-                    }
-                }, {
-                    text: 'Update title',
-                    handler: function () {
-                        _this.updateSong(songId, songTitle);
-                    }
-                }, {
-                    text: 'Favorite',
-                    role: 'destructive',
-                    handler: function () {
-                        _this.favoriteSong(songTitle);
-                    }
-                },
-                {
-                    text: 'Cancel',
-                    role: 'cancel',
-                    handler: function () {
-                        console.log('Cancel clicked');
-                    }
-                }
-            ]
-        });
-        actionSheet.present();
-    };
-    HomePage.prototype.favoriteSong = function (songTitle) {
-        this.presentAlert(songTitle);
-    }; //Fin del favoriteSong
-    HomePage.prototype.presentAlert = function (songTitle) {
-        var alert = this.alertCtrl.create({
-            title: songTitle,
-            subTitle: 'Acaba de darle favorito a esta canción.\n   ¡Felicidades!',
-            buttons: ['Cerrar.']
-        });
-        alert.present();
-    };
-    HomePage.prototype.removeSong = function (songId) {
-        this.songsRef.remove(songId);
-    };
-    HomePage.prototype.updateSong = function (songId, songTitle) {
-        var _this = this;
-        var prompt = this.alertCtrl.create({
-            title: 'Song Name',
-            message: "Update the name for this song",
-            inputs: [
-                {
-                    name: 'title',
-                    placeholder: 'Title',
-                    value: songTitle
-                },
-            ],
-            buttons: [
-                {
-                    text: 'Cancel',
-                    handler: function (data) {
-                        console.log('Cancel clicked');
-                    }
-                },
-                {
-                    text: 'Save',
-                    handler: function (data) {
-                        _this.songsRef.update(songId, {
-                            title: data.title, lastUpdatedBy: _this.currentUser.uid
-                        });
-                    }
-                }
-            ]
-        });
-        prompt.present();
-    };
+    } //Fin del constructor
+    // INICIO DEL LOGIN Y LOGOUT \\
     HomePage.prototype.login = function () {
         var _this = this;
         this.afAuth.auth.signInWithPopup(new __WEBPACK_IMPORTED_MODULE_4_firebase_app__["auth"].GoogleAuthProvider())
@@ -204,46 +99,179 @@ var HomePage = (function () {
             //userRef.push({userId: xx.user.uid, displayName: xx.user.displayName}).then((xx)=>{
             //});
         });
-    };
+    }; //Fin del login
     HomePage.prototype.loginWithEmail = function () {
         this.afAuth.auth.signInWithPopup(new __WEBPACK_IMPORTED_MODULE_4_firebase_app__["auth"].EmailAuthProvider()).then(function (xx) {
         });
-    };
+    }; //Fin del login
     HomePage.prototype.logout = function () {
         this.afAuth.auth.signOut();
+        window.location.reload(true);
+    }; //Fin del logout
+    // FIN DEL LOGIN Y LOGOUT \\
+    // Inicio de Show Opciones Boton \\
+    HomePage.prototype.showOptionsBot = function () {
+        var _this = this;
+        var actionSheet = this.actionSheetCtrl.create({
+            title: 'Seleccione su opción.',
+            buttons: [
+                {
+                    text: 'Crear Mensaje.',
+                    handler: function () {
+                        _this.addMensaje(_this.currentUser);
+                    }
+                }, {
+                    text: 'Ver seguidores.',
+                    handler: function () {
+                        _this.verSeguidores(_this.currentUser);
+                    }
+                },
+                {
+                    text: 'Cancelar.',
+                    role: 'cancel',
+                    handler: function () {
+                        console.log('Cancel clicked');
+                    }
+                }
+            ]
+        });
+        actionSheet.present();
     };
-    HomePage.prototype.generateTopics = function () {
-        this.topics = [
-            'Ana', 'Angel', 'Blad', 'Carlos', 'Diego',
-            'Fausto', 'Fernando Andres', 'Gabriela Agurcia', 'Harold', 'Jose',
-            'Juan Pablo', 'Luis', 'Maria', 'Mario',
-            'Miguel', 'Oscar Fac', 'Ricardo Fernandez', 'Victor'
-        ];
-    }; //Fin del generateTopics
-    HomePage.prototype.getTopics = function (ev) {
-        this.generateTopics();
-        var serVal = ev.target.value;
-        if (serVal && serVal.trim() != '') {
-            this.topics = this.topics.filter(function (topic) {
-                return (topic.toLowerCase().indexOf(serVal.toLowerCase()) > -1);
-            });
-        }
-    }; //Fin del getTopics
+    // Fin de showOptions Boton \\
+    // INICIO DEL AGREGAR MENSAJE \\
+    HomePage.prototype.addMensaje = function (user) {
+        var _this = this;
+        var prompt = this.alertCtrl.create({
+            title: 'Escriba su mensaje.',
+            inputs: [
+                {
+                    name: 'mensaje',
+                    placeholder: 'Mensaje.'
+                },
+            ],
+            buttons: [
+                {
+                    text: 'Cancelar.',
+                    handler: function (data) {
+                        console.log('Cancel clicked');
+                    }
+                },
+                {
+                    text: 'Save',
+                    handler: function (data) {
+                        var newMensajeRef = _this.mensajesRef.push({});
+                        var likes = 0;
+                        var dislikes = 0;
+                        var orden = 100000000;
+                        newMensajeRef.set({
+                            id: newMensajeRef.key,
+                            mensaje: data.mensaje,
+                            likes: likes,
+                            dislikes: dislikes,
+                            uid: _this.currentUser.uid,
+                            persona: _this.currentUser.name,
+                            foto: _this.currentUser.photoURL,
+                            orden: orden
+                        });
+                    }
+                }
+            ]
+        });
+        prompt.present();
+    };
+    // FIN DEL AGREGAR MENSAJE \\
+    // INICIO DE OPCIONES MENSAJE \\
+    HomePage.prototype.showOpcionesMensaje = function (mensaje, likes, dislikes, orden) {
+        var _this = this;
+        var actionSheet = this.actionSheetCtrl.create({
+            title: 'Seleccione su opción.',
+            buttons: [
+                {
+                    text: 'Like.',
+                    handler: function () {
+                        _this.like(mensaje, likes, dislikes, orden);
+                    }
+                }, {
+                    text: 'Dislike.',
+                    handler: function () {
+                        _this.dislike(mensaje, likes, dislikes, orden);
+                    }
+                },
+                {
+                    text: 'Cancelar.',
+                    role: 'cancel',
+                    handler: function () {
+                        console.log('Cancel clicked');
+                    }
+                }
+            ]
+        });
+        actionSheet.present();
+    };
+    // Fin del Show Opciones Mensaje \\
+    // Inicio del boton like \\
+    HomePage.prototype.like = function (mensaje, likes, dislikes, orden) {
+        likes++;
+        orden--;
+        this.mensajesRef.update(mensaje.id, {
+            likes: likes,
+            dislikes: dislikes,
+            orden: orden
+        });
+    }; //Fin de like
+    // Fin del boton like \\
+    // Inicio del botón dislike \\
+    HomePage.prototype.dislike = function (mensaje, likes, dislikes, orden) {
+        dislikes++;
+        this.mensajesRef.update(mensaje.id, {
+            likes: likes,
+            dislikes: dislikes,
+        });
+    }; //Fin de dislike
+    // Fin del boton dislike \\
+    // Inicio del Opciones Usuarios \\
+    HomePage.prototype.showOpcionesUsuario = function (user) {
+        var _this = this;
+        var actionSheet = this.actionSheetCtrl.create({
+            title: 'Seleccione su opción.',
+            buttons: [
+                {
+                    text: 'Seguir usuario.',
+                    handler: function () {
+                        _this.addSeguidor(user);
+                    }
+                },
+                {
+                    text: 'Cancelar.',
+                    role: 'cancel',
+                    handler: function () {
+                        console.log('Cancel clicked');
+                    }
+                }
+            ]
+        });
+        actionSheet.present();
+    }; //Fin de opciones
+    // Fin del Opciones usuarios \\
+    // Inicio del seguir usuario \\
+    HomePage.prototype.addSeguidor = function (user) {
+        var database = __WEBPACK_IMPORTED_MODULE_4_firebase_app__["database"]();
+        __WEBPACK_IMPORTED_MODULE_4_firebase_app__["database"]().ref('users/' + user.userId + '/seguidores').push({
+            nombre: this.currentUser.name
+        });
+    }; //Fin de seguir usuario
+    // Fin del seguir usuario \\
+    // Inicio de ver seguidores \\
+    HomePage.prototype.verSeguidores = function (user) {
+    };
     HomePage = __decorate([
         Object(__WEBPACK_IMPORTED_MODULE_0__angular_core__["m" /* Component */])({
-            selector: 'page-home',template:/*ion-inline-start:"C:\Users\Jose\Desktop\Sistemas\Experiencia de Usuario\Prueba1\ionic\crudApp\src\pages\home\home.html"*/'<ion-header>\n\n  <ion-navbar>\n\n    \n\n    <!--ion-buttons end *ngIf="afAuth.authState | async">\n\n    <button color="primary" ion-button icon-only (click)="addSong()">\n\n    <ion-icon name="add-circle"></ion-icon>\n\n    </button>\n\n    </ion-buttons-->\n\n    \n\n    <ion-title>\n\n      <ion-item class="item item-trns text-center">\n\n        Ejercicio Ionic App\n\n        <ion-avatar item-end *ngIf="afAuth.authState | async">\n\n          <img src={{currentUser.photoURL}}>\n\n        </ion-avatar>\n\n      </ion-item>  \n\n    </ion-title>\n\n  </ion-navbar>\n\n</ion-header>\n\n\n\n<ion-content padding>\n\n  <div *ngIf="afAuth.authState | async as user; else showLogin">\n\n    <h1>Hello {{ user.displayName }}!</h1>\n\n    <button ion-button color="primary" full (click)="logout()">Logout</button>\n\n    <ion-list>\n\n      <ion-item *ngFor="let song of songs | async" (click)="showOptions(song.id, song.title)">\n\n        {{song.title}}\n\n      </ion-item>\n\n    </ion-list>\n\n    <ion-fab right bottom>\n\n      <button ion-fab  (click)="addSong()">\n\n        <ion-icon name="add" ></ion-icon>\n\n      </button>\n\n    </ion-fab>\n\n  </div>\n\n\n\n  <ng-template #showLogin>\n\n    <p>Please login.</p>\n\n    <button ion-button color="danger"  full (click)="login()" icon-right>\n\n      <ion-icon name="logo-googleplus"></ion-icon>\n\n        Login with Google\n\n    </button>\n\n  </ng-template>\n\n\n\n  <!-- Comenzando el Google Search Bar -->\n\n  \n\n  <input id="textbox" type="text" placeholder="Search on Google..." \n\n  onkeydown="if (event.keyCode == 13 || event.which == 13) { location=\'http://www.google.com/search?q=\' \n\n  + encodeURIComponent(document.getElementById(\'textbox\').value);}" />\n\n  \n\n  <!-- Terminando el Google Search Bar -->\n\n\n\n  <!-- Comenzando redes soclaies -->\n\n    <a ion-thumbnail ion-item href="https://www.facebook.com">\n\n      <img src = "https://firebasestorage.googleapis.com/v0/b/practicaux.appspot.com/o/fb.PNG?alt=media&token=d7484950-66f2-4b80-bc18-c6c9fd8df7b0">\n\n    </a>\n\n  \n\n    <a ion-thumbnail ion-item href="https://www.twitter.com">\n\n      <img src = "">\n\n    </a>\n\n\n\n    <a ion-thumbnail ion-item href="https://www.instagram.com">\n\n      <img src = "">\n\n    </a>\n\n  <!-- Terminando redes sociales -->\n\n\n\n  <!-- Comenzando el Search Bar-->\n\n  <ion-searchbar (ionInput) = "getTopics($event)" [showCancelButton] = "shouldShowCancel" (ionCancel)="onCancel($event)"></ion-searchbar>\n\n\n\n  <ion-list>\n\n    <ion-item *ngFor = "let topic of topics">\n\n      {{topic}}\n\n    </ion-item>\n\n  </ion-list>\n\n  <!--Terminando el search bar -->\n\n  \n\n</ion-content>\n\n\n\n<ion-footer>\n\n  <div class="bottom_bar">\n\n    <ion-title>José Ricardo Fernández Ortega. 2018</ion-title>\n\n  </div>\n\n</ion-footer>\n\n\n\n'/*ion-inline-end:"C:\Users\Jose\Desktop\Sistemas\Experiencia de Usuario\Prueba1\ionic\crudApp\src\pages\home\home.html"*/
+            selector: 'page-home',template:/*ion-inline-start:"C:\Users\Jose\Desktop\Sistemas\Experiencia de Usuario\Examen1JoseFernandezUX\Prueba1\ionic\crudApp\src\pages\home\home.html"*/'<ion-header>\n\n  <ion-navbar>\n\n    <ion-title>\n\n      JF Network\n\n    </ion-title>\n\n  </ion-navbar>\n\n  </ion-header>\n\n\n\n<ion-content padding class = "MyPage">\n\n\n\n  <div *ngIf="afAuth.authState | async as user; else showLogin">\n\n    <button ion-button color="primary" full (click)="logout()">Logout</button>\n\n    <ion-fab right top>\n\n      <button ion-fab  (click)="showOptionsBot()">\n\n        <ion-icon name="eye" ></ion-icon>\n\n      </button>\n\n    </ion-fab>\n\n  </div>\n\n\n\n\n\n  <ion-list>\n\n      <ion-card>\n\n        <ion-icon name = "people" class = "icon ion-home custom-iconn"></ion-icon><h1>Lista de Usuarios</h1>\n\n        <ion-item class = "card"  *ngFor = "let user of ListaUsers | async" (click)="showOpcionesUsuario(user)">\n\n          <ion-avatar item-start *ngIf="afAuth.authState | async">\n\n              <img src={{user.photoURL}}>\n\n          </ion-avatar>{{user.displayName}}\n\n        </ion-item>\n\n      </ion-card>\n\n    </ion-list>\n\n\n\n  <ion-list>\n\n      <ion-card>\n\n        <ion-icon name = "chatbubbles" class = "icon ion-home custom-iconn"></ion-icon><h1>Mensajes</h1>\n\n        <ion-item class = "card"  *ngFor = "let mensaje of ListaMensajes | async" (click)="showOpcionesMensaje(mensaje, \n\n        mensaje.likes, mensaje.dislikes, mensaje.orden)">\n\n          <ion-avatar item-start *ngIf="afAuth.authState | async" style = "padding-top: 10px">\n\n              <img src={{mensaje.foto}}>\n\n          </ion-avatar><h2 style="font-size: 25px; color: white">{{mensaje.persona}}</h2><br><br>\n\n          <p style = "color:white; font-size: 20px;">\n\n            <ion-icon name = "text"></ion-icon> \n\n            :     {{mensaje.mensaje}}   \n\n          </p>\n\n          <br>\n\n          <ion-icon name = "thumbs-up" class="icon ion-home custom-icon" ></ion-icon> {{mensaje.likes}} <br><br>\n\n          <ion-icon name = "thumbs-down" class="icon ion-home even-more-custom-icon"></ion-icon> {{mensaje.dislikes}} <br><br><br>\n\n        </ion-item>\n\n      </ion-card>\n\n    </ion-list>\n\n\n\n  <ng-template #showLogin>\n\n    <button ion-button color="danger"  full (click)="login()" icon-right>\n\n      <ion-icon name="power"></ion-icon>\n\n    </button>\n\n  </ng-template>\n\n\n\n\n\n   \n\n\n\n\n\n</ion-content>'/*ion-inline-end:"C:\Users\Jose\Desktop\Sistemas\Experiencia de Usuario\Examen1JoseFernandezUX\Prueba1\ionic\crudApp\src\pages\home\home.html"*/
         }),
-        Object(__WEBPACK_IMPORTED_MODULE_0__angular_core__["m" /* Component */])({
-            selector: 'my-search',
-            template: '<ion-toolbar primary><ion-searchbar (input)="onInput($event)" (ionClear)="onClear($event)"></ion-searchbar></ion-toolbar><ion-content><ion-list><ion-item *ngFor="let item of items">{{ item }}</ion-item></ion-list></ion-content>'
-        }),
-        __metadata("design:paramtypes", [__WEBPACK_IMPORTED_MODULE_1_ionic_angular__["f" /* NavController */],
-            __WEBPACK_IMPORTED_MODULE_1_ionic_angular__["b" /* AlertController */],
-            __WEBPACK_IMPORTED_MODULE_1_ionic_angular__["a" /* ActionSheetController */],
-            __WEBPACK_IMPORTED_MODULE_2_angularfire2_database__["a" /* AngularFireDatabase */],
-            __WEBPACK_IMPORTED_MODULE_3_angularfire2_auth__["a" /* AngularFireAuth */]])
+        __metadata("design:paramtypes", [typeof (_a = typeof __WEBPACK_IMPORTED_MODULE_1_ionic_angular__["f" /* NavController */] !== "undefined" && __WEBPACK_IMPORTED_MODULE_1_ionic_angular__["f" /* NavController */]) === "function" && _a || Object, typeof (_b = typeof __WEBPACK_IMPORTED_MODULE_1_ionic_angular__["b" /* AlertController */] !== "undefined" && __WEBPACK_IMPORTED_MODULE_1_ionic_angular__["b" /* AlertController */]) === "function" && _b || Object, typeof (_c = typeof __WEBPACK_IMPORTED_MODULE_1_ionic_angular__["a" /* ActionSheetController */] !== "undefined" && __WEBPACK_IMPORTED_MODULE_1_ionic_angular__["a" /* ActionSheetController */]) === "function" && _c || Object, typeof (_d = typeof __WEBPACK_IMPORTED_MODULE_2_angularfire2_database__["a" /* AngularFireDatabase */] !== "undefined" && __WEBPACK_IMPORTED_MODULE_2_angularfire2_database__["a" /* AngularFireDatabase */]) === "function" && _d || Object, typeof (_e = typeof __WEBPACK_IMPORTED_MODULE_3_angularfire2_auth__["a" /* AngularFireAuth */] !== "undefined" && __WEBPACK_IMPORTED_MODULE_3_angularfire2_auth__["a" /* AngularFireAuth */]) === "function" && _e || Object])
     ], HomePage);
     return HomePage;
+    var _a, _b, _c, _d, _e;
 }());
 
 //# sourceMappingURL=home.js.map
@@ -317,7 +345,9 @@ var AppModule = (function () {
             ],
             imports: [
                 __WEBPACK_IMPORTED_MODULE_0__angular_platform_browser__["a" /* BrowserModule */],
-                __WEBPACK_IMPORTED_MODULE_2_ionic_angular__["e" /* IonicModule */].forRoot(__WEBPACK_IMPORTED_MODULE_5__app_component__["a" /* MyApp */], {}, {
+                __WEBPACK_IMPORTED_MODULE_2_ionic_angular__["e" /* IonicModule */].forRoot(__WEBPACK_IMPORTED_MODULE_5__app_component__["a" /* MyApp */], {
+                    tabsPlacement: 'top'
+                }, {
                     links: []
                 }),
                 __WEBPACK_IMPORTED_MODULE_7_angularfire2__["a" /* AngularFireModule */].initializeApp(firebaseConfig),
@@ -378,7 +408,7 @@ var MyApp = (function () {
         });
     }
     MyApp = __decorate([
-        Object(__WEBPACK_IMPORTED_MODULE_0__angular_core__["m" /* Component */])({template:/*ion-inline-start:"C:\Users\Jose\Desktop\Sistemas\Experiencia de Usuario\Prueba1\ionic\crudApp\src\app\app.html"*/'<ion-nav [root]="rootPage"></ion-nav>\n\n'/*ion-inline-end:"C:\Users\Jose\Desktop\Sistemas\Experiencia de Usuario\Prueba1\ionic\crudApp\src\app\app.html"*/
+        Object(__WEBPACK_IMPORTED_MODULE_0__angular_core__["m" /* Component */])({template:/*ion-inline-start:"C:\Users\Jose\Desktop\Sistemas\Experiencia de Usuario\Examen1JoseFernandezUX\Prueba1\ionic\crudApp\src\app\app.html"*/'<ion-nav [root]="rootPage"></ion-nav>\n\n'/*ion-inline-end:"C:\Users\Jose\Desktop\Sistemas\Experiencia de Usuario\Examen1JoseFernandezUX\Prueba1\ionic\crudApp\src\app\app.html"*/
         }),
         __metadata("design:paramtypes", [__WEBPACK_IMPORTED_MODULE_1_ionic_angular__["g" /* Platform */], __WEBPACK_IMPORTED_MODULE_2__ionic_native_status_bar__["a" /* StatusBar */], __WEBPACK_IMPORTED_MODULE_3__ionic_native_splash_screen__["a" /* SplashScreen */]])
     ], MyApp);

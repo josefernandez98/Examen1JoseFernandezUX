@@ -1,84 +1,63 @@
 <ion-header>
   <ion-navbar>
-    
-    <!--ion-buttons end *ngIf="afAuth.authState | async">
-    <button color="primary" ion-button icon-only (click)="addSong()">
-    <ion-icon name="add-circle"></ion-icon>
-    </button>
-    </ion-buttons-->
-    
     <ion-title>
-      <ion-item class="item item-trns text-center">
-        Ejercicio Ionic App
-        <ion-avatar item-end *ngIf="afAuth.authState | async">
-          <img src={{currentUser.photoURL}}>
-        </ion-avatar>
-      </ion-item>  
+      JF Network
     </ion-title>
   </ion-navbar>
-</ion-header>
+  </ion-header>
 
-<ion-content padding>
+<ion-content padding class = "MyPage">
+
   <div *ngIf="afAuth.authState | async as user; else showLogin">
-    <h1>Hello {{ user.displayName }}!</h1>
     <button ion-button color="primary" full (click)="logout()">Logout</button>
-    <ion-list>
-      <ion-item *ngFor="let song of songs | async" (click)="showOptions(song.id, song.title)">
-        {{song.title}}
-      </ion-item>
-    </ion-list>
-    <ion-fab right bottom>
-      <button ion-fab  (click)="addSong()">
-        <ion-icon name="add" ></ion-icon>
+    <ion-fab right top>
+      <button ion-fab  (click)="showOptionsBot()">
+        <ion-icon name="eye" ></ion-icon>
       </button>
     </ion-fab>
   </div>
 
+
+  <ion-list>
+      <ion-card>
+        <ion-icon name = "people" class = "icon ion-home custom-iconn"></ion-icon><h1>Lista de Usuarios</h1>
+        <ion-item class = "card"  *ngFor = "let user of ListaUsers | async" (click)="showOpcionesUsuario(user)">
+          <ion-avatar item-start *ngIf="afAuth.authState | async">
+              <img src={{user.photoURL}}>
+          </ion-avatar>{{user.displayName}}
+        </ion-item>
+      </ion-card>
+    </ion-list>
+
+  <ion-list>
+      <ion-card>
+        <ion-icon name = "chatbubbles" class = "icon ion-home custom-iconn"></ion-icon><h1>Mensajes</h1>
+        <ion-item class = "card"  *ngFor = "let mensaje of ListaMensajes | async" (click)="showOpcionesMensaje(mensaje, 
+        mensaje.likes, mensaje.dislikes, mensaje.orden)">
+          <ion-avatar item-start *ngIf="afAuth.authState | async" style = "padding-top: 10px">
+              <img src={{mensaje.foto}}>
+          </ion-avatar><h2 style="font-size: 25px; color: white">{{mensaje.persona}}</h2><br><br>
+          <p style = "color:white; font-size: 20px;">
+            <ion-icon name = "text"></ion-icon> 
+            :     {{mensaje.mensaje}}   
+          </p>
+          <br>
+          <ion-icon name = "thumbs-up" class="icon ion-home custom-icon" ></ion-icon> {{mensaje.likes}} <br><br>
+          <ion-icon name = "thumbs-down" class="icon ion-home even-more-custom-icon"></ion-icon> {{mensaje.dislikes}} <br><br><br>
+        </ion-item>
+      </ion-card>
+    </ion-list>
+
+      
+
   <ng-template #showLogin>
-    <p>Please login.</p>
     <button ion-button color="danger"  full (click)="login()" icon-right>
-      <ion-icon name="logo-googleplus"></ion-icon>
-        Login with Google
+      <ion-icon name="power"></ion-icon>
     </button>
   </ng-template>
 
-  <!-- Comenzando el Google Search Bar -->
-  
-  <input id="textbox" type="text" placeholder="Search on Google..." 
-  onkeydown="if (event.keyCode == 13 || event.which == 13) { location='http://www.google.com/search?q=' 
-  + encodeURIComponent(document.getElementById('textbox').value);}" />
-  
-  <!-- Terminando el Google Search Bar -->
 
-  <!-- Comenzando redes soclaies -->
-    <a ion-thumbnail ion-item href="https://www.facebook.com">
-      <img src = "https://firebasestorage.googleapis.com/v0/b/practicaux.appspot.com/o/fb.PNG?alt=media&token=d7484950-66f2-4b80-bc18-c6c9fd8df7b0">
-    </a>
-  
-    <a ion-thumbnail ion-item href="https://www.twitter.com">
-      <img src = "">
-    </a>
+   
 
-    <a ion-thumbnail ion-item href="https://www.instagram.com">
-      <img src = "">
-    </a>
-  <!-- Terminando redes sociales -->
 
-  <!-- Comenzando el Search Bar-->
-  <ion-searchbar (ionInput) = "getTopics($event)" [showCancelButton] = "shouldShowCancel" (ionCancel)="onCancel($event)"></ion-searchbar>
-
-  <ion-list>
-    <ion-item *ngFor = "let topic of topics">
-      {{topic}}
-    </ion-item>
-  </ion-list>
-  <!--Terminando el search bar -->
-  
 </ion-content>
-
-<ion-footer>
-  <div class="bottom_bar">
-    <ion-title>José Ricardo Fernández Ortega. 2018</ion-title>
-  </div>
-</ion-footer>
-

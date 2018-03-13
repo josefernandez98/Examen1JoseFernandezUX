@@ -25682,11 +25682,63 @@ page-home .item.item-trns {
   background-color: transparent;
 }
 
-page-home .bottom_bar {
-  position: center;
-  width: 100%;
-  height: 40px;
+page-home .custom-icon {
+  color: green;
+}
+
+page-home .even-more-custom-icon {
+  color: red;
+}
+
+page-home .MyPage {
+  background-color: #a95f5f;
+}
+
+page-home .MyPage ion-item.item.item-block.item-ios,
+page-home .MyPage ion-item.item.item-block.item-md {
+  display: -webkit-box;
+  display: -webkit-flex;
+  display: -ms-flexbox;
+  display: flex;
+  -webkit-box-align: start;
+  -webkit-align-items: flex-start;
+  -ms-flex-align: start;
+  align-items: flex-start;
+}
+
+page-home .card {
+  background-color: #ab8686;
+  color: #ffffff;
+  margin-top: 10px;
+}
+
+page-home h1 {
+  color: #ffffff;
+  background-color: #ffffff;
+  margin-top: 40px;
+  padding-left: 80px;
+}
+
+page-home .custom-iconn {
+  color: #ffffff;
+  font-size: 50px;
+  margin-left: 20px;
+  text-shadow: 0px 0px 3px;
+}
+
+page-home h2 {
+  font-size: 200me;
+  background-color: #585775;
+  height: 50px;
+  width: 300px;
+  padding-top: 10px;
   text-align: center;
-  padding-top: 7px;
-  background: #94c0ff;
+}
+
+page-home p {
+  background-color: #5b5b5e;
+  height: 50px;
+  width: 100%;
+  padding-top: 10px;
+  padding-left: 20px;
 }
