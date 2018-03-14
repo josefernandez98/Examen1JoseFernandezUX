@@ -228,16 +228,26 @@ showOpcionesMensaje(mensaje, likes, dislikes, orden) {
   addSeguidor(user) {
     var database = firebase.database();
     firebase.database().ref('users/'+user.userId+'/seguidores').push({
-      nombre: this.currentUser.name,
-      idseg: this.seguidoresRef.userId
+      nombre: this.currentUser.name
     })
+    this.follow(user);
   }//Fin de seguir usuario
 // Fin del seguir usuario \\
 
 // Inicio de ver seguidores \\
-  showOpcionesSeguidor(user) {
-    
-  }
+  
+follow(user) {
+  this.presentAlert(user);
+}//Fin del favoriteSong
+
+presentAlert(user) {
+  let alert = this.alertCtrl.create({
+    title: user.name,
+    subTitle: 'Acaba de darle follow a '+user.displayName+'!',
+    buttons: ['Cerrar.']
+  });
+  alert.present();
+}
 // Fin de ver seguidores \\
 
 

@@ -81,7 +81,10 @@ var HomePage = (function () {
             _this.mensajesRef = afDatabase.list('mensajes', function (ref) {
                 return ref.orderByChild('orden');
             });
+            _this.seguidoresRef = afDatabase.list('users/' + user.uid + '/seguidores');
             _this.ListaMensajes = _this.mensajesRef.valueChanges();
+            _this.ListaSeguidores = _this.seguidoresRef.valueChanges();
+            _this.ListaSeguidores = _this.seguidoresRef.valueChanges();
         });
     } //Fin del constructor
     // INICIO DEL LOGIN Y LOGOUT \\
@@ -119,11 +122,6 @@ var HomePage = (function () {
                     text: 'Crear Mensaje.',
                     handler: function () {
                         _this.addMensaje(_this.currentUser);
-                    }
-                }, {
-                    text: 'Ver seguidores.',
-                    handler: function () {
-                        _this.verSeguidores(_this.currentUser);
                     }
                 },
                 {
@@ -259,14 +257,24 @@ var HomePage = (function () {
         __WEBPACK_IMPORTED_MODULE_4_firebase_app__["database"]().ref('users/' + user.userId + '/seguidores').push({
             nombre: this.currentUser.name
         });
+        this.follow(user);
     }; //Fin de seguir usuario
     // Fin del seguir usuario \\
     // Inicio de ver seguidores \\
-    HomePage.prototype.verSeguidores = function (user) {
+    HomePage.prototype.follow = function (user) {
+        this.presentAlert(user);
+    }; //Fin del favoriteSong
+    HomePage.prototype.presentAlert = function (user) {
+        var alert = this.alertCtrl.create({
+            title: user.name,
+            subTitle: 'Acaba de darle follow a ' + user.displayName + '!',
+            buttons: ['Cerrar.']
+        });
+        alert.present();
     };
     HomePage = __decorate([
         Object(__WEBPACK_IMPORTED_MODULE_0__angular_core__["m" /* Component */])({
-            selector: 'page-home',template:/*ion-inline-start:"C:\Users\Jose\Desktop\Sistemas\Experiencia de Usuario\Examen1JoseFernandezUX\Prueba1\ionic\crudApp\src\pages\home\home.html"*/'<ion-header>\n\n  <ion-navbar>\n\n    <ion-title>\n\n      JF Network\n\n    </ion-title>\n\n  </ion-navbar>\n\n  </ion-header>\n\n\n\n<ion-content padding class = "MyPage">\n\n\n\n  <div *ngIf="afAuth.authState | async as user; else showLogin">\n\n    <button ion-button color="primary" full (click)="logout()">Logout</button>\n\n    <ion-fab right top>\n\n      <button ion-fab  (click)="showOptionsBot()">\n\n        <ion-icon name="eye" ></ion-icon>\n\n      </button>\n\n    </ion-fab>\n\n  </div>\n\n\n\n\n\n  <ion-list>\n\n      <ion-card>\n\n        <ion-icon name = "people" class = "icon ion-home custom-iconn"></ion-icon><h1>Lista de Usuarios</h1>\n\n        <ion-item class = "card"  *ngFor = "let user of ListaUsers | async" (click)="showOpcionesUsuario(user)">\n\n          <ion-avatar item-start *ngIf="afAuth.authState | async">\n\n              <img src={{user.photoURL}}>\n\n          </ion-avatar>{{user.displayName}}\n\n        </ion-item>\n\n      </ion-card>\n\n    </ion-list>\n\n\n\n  <ion-list>\n\n      <ion-card>\n\n        <ion-icon name = "chatbubbles" class = "icon ion-home custom-iconn"></ion-icon><h1>Mensajes</h1>\n\n        <ion-item class = "card"  *ngFor = "let mensaje of ListaMensajes | async" (click)="showOpcionesMensaje(mensaje, \n\n        mensaje.likes, mensaje.dislikes, mensaje.orden)">\n\n          <ion-avatar item-start *ngIf="afAuth.authState | async" style = "padding-top: 10px">\n\n              <img src={{mensaje.foto}}>\n\n          </ion-avatar><h2 style="font-size: 25px; color: white">{{mensaje.persona}}</h2><br><br>\n\n          <p style = "color:white; font-size: 20px;">\n\n            <ion-icon name = "text"></ion-icon> \n\n            :     {{mensaje.mensaje}}   \n\n          </p>\n\n          <br>\n\n          <ion-icon name = "thumbs-up" class="icon ion-home custom-icon" ></ion-icon> {{mensaje.likes}} <br><br>\n\n          <ion-icon name = "thumbs-down" class="icon ion-home even-more-custom-icon"></ion-icon> {{mensaje.dislikes}} <br><br><br>\n\n        </ion-item>\n\n      </ion-card>\n\n    </ion-list>\n\n\n\n  <ng-template #showLogin>\n\n    <button ion-button color="danger"  full (click)="login()" icon-right>\n\n      <ion-icon name="power"></ion-icon>\n\n    </button>\n\n  </ng-template>\n\n\n\n\n\n   \n\n\n\n\n\n</ion-content>'/*ion-inline-end:"C:\Users\Jose\Desktop\Sistemas\Experiencia de Usuario\Examen1JoseFernandezUX\Prueba1\ionic\crudApp\src\pages\home\home.html"*/
+            selector: 'page-home',template:/*ion-inline-start:"C:\Users\Jose\Desktop\Sistemas\Experiencia de Usuario\Examen1JoseFernandezUX\Prueba1\ionic\crudApp\src\pages\home\home.html"*/'<ion-header>\n\n  <ion-navbar>\n\n    <ion-title>\n\n      JF Network\n\n    </ion-title>\n\n  </ion-navbar>\n\n  </ion-header>\n\n\n\n<ion-content padding class = "MyPage">\n\n\n\n  <div *ngIf="afAuth.authState | async as user; else showLogin">\n\n    <button ion-button color="primary" full (click)="logout()">Logout</button>\n\n    <ion-fab right top>\n\n      <button ion-fab  (click)="showOptionsBot()">\n\n        <ion-icon name="eye" ></ion-icon>\n\n      </button>\n\n    </ion-fab>\n\n  </div>\n\n\n\n\n\n  <ion-list>\n\n      <ion-card>\n\n        <ion-icon name = "people" class = "icon ion-home custom-iconn"></ion-icon><h1>Lista de Usuarios</h1>\n\n        <ion-item class = "card"  *ngFor = "let user of ListaUsers | async" (click)="showOpcionesUsuario(user)">\n\n          <ion-avatar item-start *ngIf="afAuth.authState | async">\n\n              <img src={{user.photoURL}}>\n\n          </ion-avatar>{{user.displayName}}\n\n        </ion-item>\n\n      </ion-card>\n\n    </ion-list>\n\n\n\n  <ion-list>\n\n      <ion-card>\n\n        <ion-icon name = "chatbubbles" class = "icon ion-home custom-iconn"></ion-icon><h1>Mensajes</h1>\n\n        <ion-item class = "card"  *ngFor = "let mensaje of ListaMensajes | async" (click)="showOpcionesMensaje(mensaje, \n\n        mensaje.likes, mensaje.dislikes, mensaje.orden)">\n\n          <ion-avatar item-start *ngIf="afAuth.authState | async" style = "padding-top: 10px">\n\n              <img src={{mensaje.foto}}>\n\n          </ion-avatar><h2 style="font-size: 25px; color: white">{{mensaje.persona}}</h2><br><br>\n\n          <p style = "color:white; font-size: 20px;">\n\n            <ion-icon name = "text"></ion-icon> \n\n            :     {{mensaje.mensaje}}   \n\n          </p>\n\n          <br>\n\n          Público<br><br>\n\n          <ion-icon name = "thumbs-up" class="icon ion-home custom-icon" ></ion-icon> {{mensaje.likes}} <br><br>\n\n          <ion-icon name = "thumbs-down" class="icon ion-home even-more-custom-icon"></ion-icon> {{mensaje.dislikes}} <br><br><br>\n\n        </ion-item>\n\n      </ion-card>\n\n    </ion-list>\n\n\n\n      \n\n\n\n  <ng-template #showLogin>\n\n    <button ion-button color="danger"  full (click)="login()" icon-right>\n\n      <ion-icon name="power"></ion-icon>\n\n    </button>\n\n  </ng-template>\n\n\n\n\n\n   \n\n\n\n\n\n</ion-content>'/*ion-inline-end:"C:\Users\Jose\Desktop\Sistemas\Experiencia de Usuario\Examen1JoseFernandezUX\Prueba1\ionic\crudApp\src\pages\home\home.html"*/
         }),
         __metadata("design:paramtypes", [typeof (_a = typeof __WEBPACK_IMPORTED_MODULE_1_ionic_angular__["f" /* NavController */] !== "undefined" && __WEBPACK_IMPORTED_MODULE_1_ionic_angular__["f" /* NavController */]) === "function" && _a || Object, typeof (_b = typeof __WEBPACK_IMPORTED_MODULE_1_ionic_angular__["b" /* AlertController */] !== "undefined" && __WEBPACK_IMPORTED_MODULE_1_ionic_angular__["b" /* AlertController */]) === "function" && _b || Object, typeof (_c = typeof __WEBPACK_IMPORTED_MODULE_1_ionic_angular__["a" /* ActionSheetController */] !== "undefined" && __WEBPACK_IMPORTED_MODULE_1_ionic_angular__["a" /* ActionSheetController */]) === "function" && _c || Object, typeof (_d = typeof __WEBPACK_IMPORTED_MODULE_2_angularfire2_database__["a" /* AngularFireDatabase */] !== "undefined" && __WEBPACK_IMPORTED_MODULE_2_angularfire2_database__["a" /* AngularFireDatabase */]) === "function" && _d || Object, typeof (_e = typeof __WEBPACK_IMPORTED_MODULE_3_angularfire2_auth__["a" /* AngularFireAuth */] !== "undefined" && __WEBPACK_IMPORTED_MODULE_3_angularfire2_auth__["a" /* AngularFireAuth */]) === "function" && _e || Object])
     ], HomePage);
